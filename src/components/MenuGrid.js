@@ -28,13 +28,20 @@ const useStyles = makeStyles(theme => ({
   },
   icon: {
     color: "rgba(255, 255, 255, 0.54)"
+  },
+  img: {
+    transition: 'transform .2s',
+    margin: '0 auto',
+    '&:hover': {
+       transform: 'scale(2.0, 2.0)',      
+    },
   }
 }));
 
 export default function MenuGrid(props) {
     const classes = useStyles();
   return(<div className={classes.root} id='menuFilms'>
-          <GridList cellHeight={180} className={classes.gridList}>
+          <GridList cellHeight={250} className={classes.gridList}>
             <GridListTile key="Subheader" cols={2} style={{ height: "auto" }}>
               <ListSubheader component="div">{props.genre || "Genres"}</ListSubheader>
             </GridListTile>
@@ -46,7 +53,7 @@ export default function MenuGrid(props) {
                   props.filmPage(tile.search, tile.title)                  
                 }}
               >
-                <img src={tile.img} alt={tile.title} />
+                <img className={classes.img} src={tile.img} alt={tile.title} />
                 <GridListTileBar
                   title={tile.title}
                   subtitle={

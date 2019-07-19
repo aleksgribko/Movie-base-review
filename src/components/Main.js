@@ -17,40 +17,12 @@ export default class Main extends Component {
 			mainstream: [],
 			action: [],
 			criminal: [],
-			drama: [],
-			clickedGenre: null
-		};
+			drama: [],	
 
-		this.filmPage = this.filmPage.bind(this);
-	}
+		};		
+	}	
 
-	filmPage(genre) {
-		console.log(genre);		
-		switch (genre) {
-			case "comedies":
-				this.setState({ clickedGenre: this.state.comedies });
-				break;
-			case "fantastic":
-				this.setState({ clickedGenre: this.state.fantastic });
-				break;
-			case "mainstream":
-				this.setState({ clickedGenre: this.state.mainstream });
-				break;
-			case "action":
-				this.setState({ clickedGenre: this.state.action });
-				break;
-			case "criminal":
-				this.setState({ clickedGenre: this.state.criminal });
-				break;
-			case "drama":
-				this.setState({ clickedGenre: this.state.drama });
-				break;
-			default:
-				this.setState({ clickedGenre: null });
-		}
-	}
-
-	componentDidMount() {
+	componentDidMount() {		
 		for (let oneGenre of filmsGridData) {
 			for (let oneMovie of oneGenre.moviesId) {
 				let url = `${baseURL}${oneMovie}?language=en-US&api_key=${keyAPI}`;
@@ -76,7 +48,7 @@ export default class Main extends Component {
 								let comediesArray = [...this.state.comedies];
 								comediesArray.push(movie);
 								console.log(comediesArray)
-								this.setState({ comedies: comediesArray });
+								this.setState({ comedies: comediesArray });								
 								break;
 							case "fantastic":
 								let fantasticArray = [...this.state.fantastic];
@@ -123,15 +95,15 @@ export default class Main extends Component {
 						console.log(err);
 					});
 			}
-		}
-	}
+		}		
+}
 	render() {
 		console.log(this.state);
 		return (
 			<React.Fragment>
 				<CssBaseline />
 				<Container maxWidth="lg">
-					<FilmGrid filmPage={this.filmPage} clickedGenre={this.state.clickedGenre}/>
+					<FilmGrid moviesAll={this.state}/>
 				</Container>
 			</React.Fragment>
 		);

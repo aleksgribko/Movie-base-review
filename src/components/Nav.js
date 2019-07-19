@@ -52,7 +52,7 @@ export default function Nav() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Rate my favorite movies
+           
           </Typography>
           <Button onClick={aboutOpen} color="inherit">About</Button>
           <Button color="inherit">Login</Button>
