@@ -1,18 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import store from './store'
+
+import { Provider } from 'react-redux'
 import './index.css';
 import App from './App';
 
-//import { createStore } from 'redux'
-//import moviesList from './reducers/reducer1.js' 
+/*
+Allows access to state via                     getState();
+Allows state to be updated via                 dispatch(action);
+Registers listeners via                        subscribe(listener);
+Handles unregistering of listeners 
+via the function returned by                   subscribe(listener).
+*/
 
-/* const store = createStore(
-	moviesList, 
-	window.STATE_FROM_SERVER,
-	// upload to the extension
-	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-)*/
+import { fetchMovies } from './actions/action.js'
+//import { filmsGridData } from "./filmsGridData.js";
 
+/*for (let oneGenre of filmsGridData) {
+	for (let oneMovie of oneGenre.moviesId) {
+		store.dispatch(fetchMovies(oneMovie)).then(() => console.log(store.getState()))
+	}
+}
+*/
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+<Provider store={store}>
+    <App />
+  </Provider>, document.getElementById('root'));
 

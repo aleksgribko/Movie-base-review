@@ -4,10 +4,21 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import Modal from '@material-ui/core/Modal';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,10 +41,15 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(4),
     outline: 'none',
   },
+  linkMenu: {
+    textDecoration: 'none',
+  }
 }));
 
-export default function Nav() {
-  const [open, setOpen] = React.useState(false); 
+function Nav(props) {
+  // props: changeGenre={changeGenre}
+  const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const aboutOpen = () => {
     setOpen(true);
@@ -42,40 +58,86 @@ export default function Nav() {
   const aboutClose = () => {
     setOpen(false);
   };
+
+  function dropdownClick(event) {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function dropdownClose(genre) {
+    setAnchorEl(null);
+    if(genre){
+      console.log(genre)
+      props.switchGenre(genre);
+      props.switchMovie(null)
+    }    
+  }
+
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Menu">
-            <MenuIcon />
-          </IconButton>
+          <Button color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={dropdownClick}>
+            Choose a genre
+          </Button>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => dropdownClose(null)}
+          >
+            <MenuItem onClick={() => dropdownClose('comedies')}><Link className={classes.linkMenu} to={`/genre/comedies`} >Comedies</Link></MenuItem>
+            <MenuItem onClick={() => dropdownClose('fantastic')}><Link className={classes.linkMenu} to={`/genre/fantastic`} >Fantastic</Link></MenuItem>
+            <MenuItem onClick={() => dropdownClose('mainstream')}><Link className={classes.linkMenu} to={`/genre/mainstream`} >Mainstream</Link></MenuItem>
+            <MenuItem onClick={() => dropdownClose('action')}><Link className={classes.linkMenu} to={`/genre/action`} >Action</Link></MenuItem>
+            <MenuItem onClick={() => dropdownClose('criminal')}><Link className={classes.linkMenu} to={`/genre/criminal`} >Criminal</Link></MenuItem>
+            <MenuItem onClick={() => dropdownClose('drama')}><Link className={classes.linkMenu} to={`/genre/drama`} >Drama</Link></MenuItem>            
+          </Menu>
           <Typography variant="h6" className={classes.title}>
-           
+
           </Typography>
           <Button onClick={aboutOpen} color="inherit">About</Button>
-          <Button color="inherit">Login</Button>
+         
         </Toolbar>
       </AppBar>
-      <Modal
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
+      <Dialog
         open={open}
+        TransitionComponent={Transition}
+        keepMounted
         onClose={aboutClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
       >
-        <div className={classes.paper}>
-          <Typography variant="h6" align="center" id="modal-title">
-            Project to show usage of technologies
-          </Typography>
-          <Typography variant="subtitle1" id="modal-description">
-            <p>react, material ui, node.js, express.js, MongoDB, API</p>
-            <p>Made by Aleksandr Gribko</p>
-            <a href='https://agribko.netlify.com'>Site</a>
-          </Typography>
-          
-        </div>
-      </Modal>
+        <DialogTitle id="alert-dialog-slide-title">{"Project to show usage of technologies"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            React, Redux, material ui<br/>
+            Made by Aleksandr Gribko<br/>
+            <a href='https://agribko.netlify.com'>Visit my Portfolio Website</a>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={aboutClose} color="primary">
+            Got it
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
+
+
+const mapDispatchToProps = dispatch => {
+  return {
+    switchGenre: (newGenre) => {
+      dispatch({type:"SWITCH_GENRE", genre: newGenre})
+    },
+    switchMovie: (newMovie) => {
+      dispatch({type: "SWITCH_MOVIE", movie: newMovie})
+    },
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Nav)

@@ -1,30 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import IconButton from "@material-ui/core/IconButton";
-import InfoIcon from "@material-ui/icons/Info";
-import { filmsGridData } from "./filmsGridData.js";
-import getMovies from "./filmsData.js";
-import GenreGrid from "./GenreGrid.js";
-import OneMoviePage from "./OneMoviePage.js"
-import MenuGrid from "./MenuGrid.js"
 import Paper from '@material-ui/core/Paper';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
-// Grid for showing either (1) menu of genres, (2) movies of a genre, (3) page of one movie
-
-//I AM ABLE TO GET PROPS WITH MOVIES HERE! props.moviesAll
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
-  root: {
+  rootFilms: {
     flexWrap: "wrap",
-    justifyContent: "space-around",
+    justifyContent: "center",
     overflow: "hidden",
     backgroundColor: theme.palette.background.paper
   },
@@ -32,135 +22,126 @@ const useStyles = makeStyles(theme => ({
     maxWidth: "100%",
     height: "100%",
     margin: '0px',
+    justifyContent: "space-evenly",
   },
   icon: {
     color: "rgba(255, 255, 255, 0.54)"
   },
-  img: {
-    transition: 'transform .2s',
-    margin: '0 auto',
+  breadCrumbsNav: {
+    fontSize: '1.5rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: 'fit-content',
     '&:hover': {
-       transform: 'scale(2.0, 2.0)',      
+      cursor: 'pointer',
     },
-    breadcrumbs: {
-      justifyContent: 'center',
-      flexWrap: 'wrap',
+  },
+  fontInBreadCrumbs: {
+    fontSize: '1.5rem',
+  },
+  imgFilms: {
+    transition: 'transform .5s',
+    transform: 'translate(0, 0)',
+    '&:hover': {
+      transform: 'scale(1.2, 1.2)',
     },
-    paperBreadcrumbs: {
-      padding: theme.spacing(1, 2),
-    },
+    top: '0',
+    left: '0',
+    height: '100%',
+  },
+  breadcrumbs: {
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  paperBreadcrumbs: {
+    padding: theme.spacing(1, 2),
+  },
+  paperFilms: {
+    padding: theme.spacing(3, 2)
   }
-}));
+}
+));
 
-export default function FilmGrid(props) {
+function FilmGrid(props) {
+  console.log(props)
   const classes = useStyles();
 
-  const [genre, setGenre] = useState(null); 
-  const [onePage, setOnePage] = useState(null);
-  const [clickedMovies, setClickedMovies] = useState(null); 
+  // Function to render particular genre if the page was updated
 
-
-  function filmPage(search, title){
-    changeMovies(search)
-    setGenre(title)
+  if(props.match.path === '/genre') {    
+    let pageGenre = props.location.pathname.slice(7, props.location.pathname.length)
+    if(props.genre !== pageGenre){
+      props.switchGenre(pageGenre)
+    }    
   }
 
-  function backToMenu(){    
-    filmPage('empty', null)
-    setOnePage(null)
-  }  
-
-  function backToGenre(){   
-    debugger 
-    setOnePage(null)
-  }  
-
-  function changeMovies(genre) {		
-		switch (genre) {
-			case "comedies":
-        setClickedMovies(props.moviesAll.comedies);
-				break;
-			case "fantastic":
-        setClickedMovies(props.moviesAll.fantastic);
-				break;
-			case "mainstream":
-        setClickedMovies(props.moviesAll.mainstream);
-				break;
-			case "action":
-        setClickedMovies(props.moviesAll.action);      
-				break;
-			case "criminal":
-        setClickedMovies(props.moviesAll.criminal);
-				break;
-			case "drama":
-        setClickedMovies(props.moviesAll.drama);
-        break;
-      case "empty":
-        setClickedMovies(null);
-        break;
-			default:
-        setClickedMovies(null);
-		}
-	}
-
-  function changeRender() {    
- 
-    if (clickedMovies && !onePage) {
-      console.log('movies')      
-      return (<div className={classes.root}>
-          <GridList cellHeight={350} className={classes.gridList}>
-            <GridListTile cols={2} className={classes.breadcrumbs} key="Subheader"  style={{ height: "auto" }}>
-                                                    
-                <Paper elevation={0} className={classes.paperBreadcrumbs}>
-                  <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="Breadcrumb">
-                    <Link color="inherit" onClick={() => backToMenu()}>
-                      All Genres
-                    </Link>
-                    <Typography color="textPrimary">
-                    {genre || "Genres"}
-                    </Typography>               
-                  </Breadcrumbs>
-                </Paper>     
-
-            </GridListTile>
-           {clickedMovies.map(tile => (
-             <GridListTile
-                key={tile.name} 
-                 cols={0.5}
-                 onClick={() => {                  
-                  setOnePage({name: tile.name, descr: tile.descr, pic: tile.pic, tagline: tile.tagline, rank: tile.rank, genreList: props.clickedGenre})
-                }}              
-              >
-                <img src={tile.pic} alt={tile.title} className={classes.img}/>
-                <GridListTileBar
-                  title={tile.name}
-                  subtitle={
-                    <span>rank: {tile.rank}</span>
-                  }
-                  actionIcon={
-                    <IconButton
-                      aria-label={`info about ${tile.name}`}
-                      className={classes.icon}
-                    >
-                      <InfoIcon />
-                    </IconButton>
-                  }
-                />
-              </GridListTile>
-            ))}
-          </GridList>
-        </div>
-      )      
-    } else if (onePage) {   
-      console.log('onepage')   
-       return <OneMoviePage genre={genre} onePage={onePage} backToGenre={backToGenre} backToMenu={backToMenu}/>      
-    } else {      
-      console.log('menu') 
-        return (<MenuGrid genre={genre} filmPage={filmPage}/> 
-      )
-    }
-    
-  }
-  
-  return <div>{changeRender()}</div>;
+  return (<div>
+    <Paper elevation={0} className={classes.paperBreadcrumbs}>
+      <Breadcrumbs className={classes.breadCrumbsNav} separator={<NavigateNextIcon fontSize="small" />} aria-label="Breadcrumb">
+        <Link to={`/`} onClick={() =>
+          props.switchGenre(null)
+        }>
+          All Genres
+          </Link>
+        <Typography className={classes.fontInBreadCrumbs} color="textPrimary">
+          {props.genre || "Genres"}
+        </Typography>
+      </Breadcrumbs>
+    </Paper>
+    <Paper className={classes.paperFilms}>
+      <div className={classes.rootFilms}>
+        <GridList cellHeight={350} className={classes.gridList}>
+          {props.movies
+            .filter(oneMovie => {
+              return (oneMovie.genre === props.genre)
+            }
+            )
+            .map(tile => {
+              return (
+                <GridListTile
+                  className={classes.gridListTit}
+                  style={{ 'width': '234px', }}
+                  key={tile.original_title}
+                  cols={0.5}
+                  onClick={() => {
+                    props.switchMovie(tile)
+                  }}
+                >
+                  <Link to={`/movie/${tile.imdb_id}`}>
+                    <img src={`https://image.tmdb.org/t/p/w500${tile.poster_path}`} alt={tile.title} className={classes.imgFilms} />
+                  </Link>
+                  <GridListTileBar
+                    title={tile.title}
+                    subtitle={
+                      <span>rank: {tile.vote_average}</span>
+                    }
+                  />
+                </GridListTile>
+              )
+            })}
+        </GridList>
+      </div>
+    </Paper>
+  </div>)
 }
+
+const mapStateToProps = state => ({
+  movies: state.movies.movies,
+  genre: state.page.currentGenre,
+  onePage: state.page.currentMovie,
+  isFetching: state.movies.isFetching,
+})
+
+const mapDispatchToProps = dispatch => {
+  return {
+    switchGenre: (newGenre) => {
+      dispatch({ type: "SWITCH_GENRE", genre: newGenre })
+    },
+    switchMovie: (newMovie) => {
+      dispatch({ type: "SWITCH_MOVIE", movie: newMovie })
+    },
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FilmGrid)
+

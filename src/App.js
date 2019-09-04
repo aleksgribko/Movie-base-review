@@ -1,34 +1,40 @@
-import React from 'react';
-import Nav from './components/Nav.js'
+import React, { Component } from 'react';
+
 import Main from './components/Main.js'
 import Footer from './components/Footer.js'
 import './App.css';
 
-//import { connect } from 'react-redux'
-//import { updateUser } from './actions/action-2.js';
+import { filmsGridData } from "./components/filmsGridData.js";
+
+import { connect } from 'react-redux'
+import { fetchMovies } from './actions/action.js'
 
 
-function App() {  
-  return (
-    <div className="App">
-      <Nav />
-      <Main />
-      <Footer />
-    </div>
-  );
+class App extends Component {   
+  constructor() {
+		super();				
+  }
+  
+  componentDidMount() {	
+		let allMoviesIds = []	
+		let mappedGenre
+		for (let oneGenre of filmsGridData) {  
+			mappedGenre = oneGenre.search
+			for (let oneId of oneGenre.moviesId) { 
+				allMoviesIds = [...allMoviesIds, {id: oneId, genre: mappedGenre}]  
+			}			    
+		}	
+		this.props.fetchMovies(allMoviesIds)
+	}
+
+  render(){
+    return (
+      <div className="App">        
+        <Main />
+        <Footer />
+      </div>
+    );
+  }  
 }
 
-/*
-const mapStateToProps = state => ({
-  products: state.products,
-  users: state.users
-})
-
-const mapActionToProps = state => {
-  onUpdateUser: updateUser
-}
-*/
-//connect(mapStateToProps, mapActionToProps)
-export default App;
-
-//mapStateToProps - state of the store for use
+export default connect(null, { fetchMovies })(App) 
